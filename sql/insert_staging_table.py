@@ -9,6 +9,11 @@ def insert_csv_to_staging(csv_path, table_name):
     try:
         # Specify encoding to handle non-UTF-8 files
         df = pd.read_csv(csv_path, encoding='ISO-8859-1')  # Change encoding if needed
+        
+        # Rename column 'coustomer' to 'customer' if it exists
+        if 'coustomer_key' in df.columns:
+            df.rename(columns={'coustomer_key': 'customer_key'}, inplace=True)
+        
         df.to_sql(table_name, engine, if_exists='replace', index=False)
         print(f"Inserted {csv_path} into {table_name}")
     except UnicodeDecodeError as e:

@@ -14,11 +14,11 @@ def main():
     insert_csv_to_staging('data/time_dim.csv', 'staging_time')
     insert_csv_to_staging('data/store_dim.csv', 'staging_store')
     insert_csv_to_staging('data/fact_table.csv', 'staging_sales')
-    insert_csv_to_staging('data/Trans_dim.csv', 'staging_payment')
-
+    insert_csv_to_staging('data/Trans_dim.csv', 'staging_payment') 
     # Bước 3: Thực hiện ETL từ staging vào bảng chính
     print("Performing ETL from staging to main tables...")
     etl_staging_to_main()
+    # transform_and_load_items() 
 
     print("Data Warehouse pipeline executed successfully!")
 
