@@ -11,9 +11,9 @@ def create_tables():
     )
     cursor = conn.cursor()
 
-    # Drop existing tables to ensure a clean state
-    for query in DROP_TABLES:
-        cursor.execute(query)
+    # # Drop existing tables to ensure a clean state
+    # for query in DROP_TABLES:
+    #     cursor.execute(query)
 
     # Create staging tables
     for query in STAGING_TABLES:

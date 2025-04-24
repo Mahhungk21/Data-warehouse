@@ -17,6 +17,7 @@ def etl_staging_to_main():
             INSERT INTO dim_customer (customer_key, name, contact_no, nid)
             SELECT DISTINCT customer_key, name, contact_no, nid
             FROM staging_customer
+            ON CONFLICT (customer_key) DO NOTHING;
         ''')
         print("Inserted data into dim_customer")
 
@@ -56,6 +57,7 @@ def etl_staging_to_main():
                     ELSE NULL
                 END AS subcategory
             FROM staging_item
+            ON CONFLICT (item_key) DO NOTHING;
         ''')
         print("Inserted data into dim_item")
         
@@ -65,6 +67,7 @@ def etl_staging_to_main():
             INSERT INTO dim_store (store_key, division, district, upazila)
             SELECT DISTINCT store_key, division, district, upazila
             FROM staging_store
+            ON CONFLICT (store_key) DO NOTHING;
         ''')
         print("Inserted data into dim_store")
 
@@ -74,8 +77,8 @@ def etl_staging_to_main():
                 INSERT INTO dim_time (time_key, date, time, hour, day, week, month, month_name, quarter, year)
                 SELECT DISTINCT 
                     time_key, 
-                    TO_TIMESTAMP(date, 'DD-MM-YYYY')::DATE AS date, 
-                    TO_TIMESTAMP(date, 'DD-MM-YYYY HH24:MI')::TIME AS time, 
+                    date::DATE AS date, 
+                    date::TIME AS time, 
                     hour, 
                     day, 
                     week, 
@@ -97,6 +100,7 @@ def etl_staging_to_main():
                     quarter, 
                     year
                 FROM staging_time
+                ON CONFLICT (time_key) DO NOTHING;
             ''')
         print("Inserted data into dim_time")
 
@@ -106,6 +110,7 @@ def etl_staging_to_main():
             INSERT INTO dim_payment (payment_key, trans_type, bank_name)
             SELECT DISTINCT payment_key, trans_type, bank_name
             FROM staging_payment
+            ON CONFLICT (payment_key) DO NOTHING;
         ''')
         print("Inserted data into dim_payment")
 
@@ -115,15 +120,16 @@ def etl_staging_to_main():
             INSERT INTO fact_sales (payment_key, customer_key, time_key, item_key, store_key, quantity, unit, unit_price, total_price)
             SELECT payment_key, customer_key, time_key, item_key, store_key, quantity, unit, unit_price, total_price
             FROM staging_sales
+            ON CONFLICT (payment_key, customer_key, time_key, item_key, store_key) DO NOTHING;
         ''')
         print("Inserted data into fact_sales")
 
-        # Drop staging tables
-        print("Dropping staging tables...")
-        staging_tables = ['staging_customer', 'staging_item', 'staging_store', 'staging_time', 'staging_payment', 'staging_sales']
-        for table in staging_tables:
-            cursor.execute(f'DROP TABLE IF EXISTS {table} CASCADE')
-            print(f"Dropped table {table}")
+        # # Drop staging tables
+        # print("Dropping staging tables...")
+        # staging_tables = ['staging_customer', 'staging_item', 'staging_store', 'staging_time', 'staging_payment', 'staging_sales']
+        # for table in staging_tables:
+        #     cursor.execute(f'DROP TABLE IF EXISTS {table} CASCADE')
+        #     print(f"Dropped table {table}")
 
         conn.commit()
     except Exception as e:

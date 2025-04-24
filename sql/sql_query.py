@@ -19,7 +19,7 @@ DROP_TABLES = [
 ]
 
 # Create staging tables
-CREATE_STAGING_SALES = '''CREATE TABLE staging_sales (
+CREATE_STAGING_SALES = '''CREATE TABLE IF NOT EXISTS staging_sales (
     payment_key VARCHAR,
     customer_key VARCHAR,
     time_key VARCHAR,
@@ -28,23 +28,26 @@ CREATE_STAGING_SALES = '''CREATE TABLE staging_sales (
     quantity INTEGER,
     unit TEXT,
     unit_price NUMERIC(18,2),
-    total_price NUMERIC(18,2)
+    total_price NUMERIC(18,2),
+    timecreate TIMESTAMP NOT NULL DEFAULT NOW()
 )'''
 
-CREATE_STAGING_PAYMENT = '''CREATE TABLE staging_payment (
+CREATE_STAGING_PAYMENT = '''CREATE TABLE IF NOT EXISTS staging_payment (
     payment_key VARCHAR PRIMARY KEY,
     trans_type VARCHAR,
-    bank_name VARCHAR
+    bank_name VARCHAR,
+    timecreate TIMESTAMP NOT NULL DEFAULT NOW()
 )'''
 
-CREATE_STAGING_CUSTOMER = '''CREATE TABLE staging_customer (
+CREATE_STAGING_CUSTOMER = '''CREATE TABLE IF NOT EXISTS staging_customer (
     customer_key VARCHAR PRIMARY KEY,
     name TEXT,
     contact_no TEXT,
-    nid TEXT
+    nid TEXT,
+    timecreate TIMESTAMP NOT NULL DEFAULT NOW()
 )'''
 
-CREATE_STAGING_TIME = '''CREATE TABLE staging_time (
+CREATE_STAGING_TIME = '''CREATE TABLE IF NOT EXISTS staging_time (
     time_key VARCHAR PRIMARY KEY,
     date TIMESTAMP,
     hour INTEGER,
@@ -52,41 +55,44 @@ CREATE_STAGING_TIME = '''CREATE TABLE staging_time (
     week VARCHAR,
     month INTEGER,
     quarter VARCHAR,
-    year INTEGER
+    year INTEGER,
+    timecreate TIMESTAMP NOT NULL DEFAULT NOW()
 )'''
 
-CREATE_STAGING_ITEM = '''CREATE TABLE staging_item (
+CREATE_STAGING_ITEM = '''CREATE TABLE IF NOT EXISTS staging_item (
     item_key VARCHAR PRIMARY KEY,
     item_name VARCHAR,
     "desc" VARCHAR,
     unit_price NUMERIC(10,2),
     man_country VARCHAR,
     supplier VARCHAR,
-    unit VARCHAR
+    unit VARCHAR,
+    timecreate TIMESTAMP NOT NULL DEFAULT NOW()
 )'''
 
-CREATE_STAGING_STORE = '''CREATE TABLE staging_store (
+CREATE_STAGING_STORE = '''CREATE TABLE IF NOT EXISTS staging_store (
     store_key VARCHAR PRIMARY KEY,
     division VARCHAR,
     district VARCHAR,
-    upazila VARCHAR
+    upazila VARCHAR,
+    timecreate TIMESTAMP NOT NULL DEFAULT NOW()
 )'''
 
 # Create dimension tables
-CREATE_DIM_PAYMENT = '''CREATE TABLE dim_payment (
+CREATE_DIM_PAYMENT = '''CREATE TABLE IF NOT EXISTS dim_payment (
     payment_key VARCHAR PRIMARY KEY,
     trans_type VARCHAR,
     bank_name VARCHAR
 )'''
 
-CREATE_DIM_CUSTOMER = '''CREATE TABLE dim_customer (
+CREATE_DIM_CUSTOMER = '''CREATE TABLE IF NOT EXISTS dim_customer (
     customer_key VARCHAR PRIMARY KEY,
     name TEXT,
     contact_no TEXT,
     nid TEXT
 )'''
 
-CREATE_DIM_TIME = '''CREATE TABLE dim_time (
+CREATE_DIM_TIME = '''CREATE TABLE IF NOT EXISTS dim_time (
     time_key VARCHAR PRIMARY KEY,
     date TIMESTAMP,
     time TIME,
@@ -99,7 +105,7 @@ CREATE_DIM_TIME = '''CREATE TABLE dim_time (
     month_name VARCHAR(3)
 )'''
 
-CREATE_DIM_ITEM = '''CREATE TABLE dim_item (
+CREATE_DIM_ITEM = '''CREATE TABLE IF NOT EXISTS dim_item (
     item_key VARCHAR PRIMARY KEY,
     item_name VARCHAR,
     "desc" VARCHAR,
@@ -111,7 +117,7 @@ CREATE_DIM_ITEM = '''CREATE TABLE dim_item (
     subcategory VARCHAR -- Thêm cột subcategory
 )'''
 
-CREATE_DIM_STORE = '''CREATE TABLE dim_store (
+CREATE_DIM_STORE = '''CREATE TABLE IF NOT EXISTS dim_store (
     store_key VARCHAR PRIMARY KEY,
     division VARCHAR,
     district VARCHAR,
@@ -119,7 +125,7 @@ CREATE_DIM_STORE = '''CREATE TABLE dim_store (
 )'''
 
 # Create fact tables
-CREATE_FACT_SALES = '''CREATE TABLE fact_sales (
+CREATE_FACT_SALES = '''CREATE TABLE IF NOT EXISTS fact_sales (
     sales_id SERIAL PRIMARY KEY,
     payment_key VARCHAR REFERENCES dim_payment(payment_key),
     customer_key VARCHAR REFERENCES dim_customer(customer_key),
